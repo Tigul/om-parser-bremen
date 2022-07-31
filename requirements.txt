@@ -3,3 +3,4 @@ pyopenmensa==0.95.0
 bs4==0.0.1
 requests==2.22.0
 jinja2==2.10.1
+markupsafe==1.1.1
