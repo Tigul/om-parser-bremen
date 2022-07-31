@@ -1,3 +1,4 @@
 Flask==1.1.4
 pyopenmensa==0.95.0
 bs4==0.0.1
+requests==2.22.0
