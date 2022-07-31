@@ -4,15 +4,22 @@ from datetime import date, timedelta
 import requests
 import re
 
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route("/")
+def test():
+    return "<p>Hello, World!</p>"
+
 def next_weekday(d, weekday):
     days_ahead = weekday - d.weekday()
     if days_ahead <= 0: # Target day already happened this week
         days_ahead += 7
     return d + timedelta(days_ahead)
 
-#if __name__ == "__main__":
 def get_plan_for_mensa(mensa):
-    html = requests.get("https://www.stw-bremen.de/de/mensa/" + mensa)
+    html = requests.get("https://www.stw-bremen.de/de/" + mensa)
     soup = BeautifulSoup(html.text, 'html.parser')
 
     canteen = LazyBuilder()
@@ -38,7 +45,7 @@ def get_plan_for_mensa(mensa):
                 # Find category name for this meal
                 for h in meal.find_all('th', {'class': 'category-name'}):
                     # Should only be one entry, regular expression is to trim multiple spaces
-                    meal_category = re.sub(' +', ' ', h.text)
+                    meal_category = re.sub(' +', ' ', h.text).replace('&', 'und')
 
                 # Get food type, e.g. plant-based/vegan, vegetarian, chicken, etc.
                 if 'class' in meal.attrs:
@@ -78,8 +85,18 @@ def get_plan_for_mensa(mensa):
             current = next_weekday(current, 0)
             #break
         #break
-    print(canteen.toXMLFeed())
+    return canteen.toXMLFeed()
+    #print(canteen.toXMLFeed())
 
 
-if __name__ == '__main__':
-    get_plan_for_mensa("uni-mensa")
+
+@app.route("/mensa/<mensa>")
+def parse_mensa(mensa):
+    return get_plan_for_mensa("mensa/" + mensa)
+
+@app.route("/cafeteria/<cafeteria>")
+def parse_cafeteria(cafeteria):
+    return get_plan_for_mensa("cafeteria/" + cafeteria)
+
+#if __name__ == '__main__':
+#    get_plan_for_mensa("uni-mensa")
