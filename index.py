@@ -4,13 +4,13 @@ from datetime import date, timedelta
 import requests
 import re
 
-from flask import Flask
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
 @app.route("/")
 def test():
-    return "<p>Hello, World!</p>"
+    return render_template('index.html')
 
 def next_weekday(d, weekday):
     days_ahead = weekday - d.weekday()
